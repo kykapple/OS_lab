@@ -147,15 +147,17 @@ void sort_by_service_time(JOB* jobs, int start_idx, int prev_job_end_time, int j
 FIFO scheduling - Non-preemptive, Single Queue
 */
 void FIFO(int job_cnt) {
+	int total_time = 0;
+	int current_time = 0;
+
 	Queue* q = (Queue*)malloc(sizeof(Queue));
 	q->jobs = (JOB*)malloc(sizeof(JOB) * job_cnt);		// workload
-	int total_time = create_workload(q->jobs, job_cnt);		// create workload, get total service time
+	total_time = create_workload(q->jobs, job_cnt);		// create workload, get total service time
     
 	init(job_cnt, total_time);					// initialize footprints
 
 	sort_by_arrival_time(q->jobs, job_cnt);			// sort by arrival time or sort alphabetically if processes arrive at the same time
 
-	int current_time = 0;
 	for (int i = 0; i < job_cnt; i++) {
 		JOB* cur_job = &q->jobs[i];
 
@@ -174,15 +176,17 @@ void FIFO(int job_cnt) {
 SJF scheduling - Non-preemptive, Single Queue, jobs that finish quickly have high priority
 */
 void SJF(int job_cnt) {
+	int total_time = 0;
+	int current_time = 0;
+
 	Queue* q = (Queue*)malloc(sizeof(Queue));
 	q->jobs = (JOB*)malloc(sizeof(JOB) * job_cnt);		// workload
-	int total_time = create_workload(q->jobs, job_cnt);		// create workload, get total service time
+	total_time = create_workload(q->jobs, job_cnt);		// create workload, get total service time
 
 	init(job_cnt, total_time);					// initialize footprints
 
 	sort_by_service_time(q->jobs, 0, 0, job_cnt);			// sort by arrival time and service time to select first job
 
-	int current_time = 0;
 	for (int i = 0; i < job_cnt; i++) {
 		JOB* cur_job = &q->jobs[i];
 
@@ -203,6 +207,10 @@ void SJF(int job_cnt) {
 RR scheduling - preemptive, job runs during the time quantum, expected RR need a linkedlist
 */
 void RR(int job_cnt) {
+	int total_time = 0;
+	int current_time = 0;
+	int next = 1;
+
 	Queue* q = (Queue*)malloc(sizeof(Queue));
 	q->list = (JOB_LIST*)malloc(sizeof(JOB_LIST));	// create linkedlist
 	q->list->head = NULL;
@@ -212,7 +220,7 @@ void RR(int job_cnt) {
 	scanf("%d", &q->time_quantum);
 
 	JOB* jobs = (JOB*)malloc(sizeof(JOB) * job_cnt);	// to create workload
-	int total_time = create_workload(jobs, job_cnt);	// create workload, get total service time
+	total_time = create_workload(jobs, job_cnt);	// create workload, get total service time
 
 	init(job_cnt, total_time);				// initialize footprints
     
@@ -220,12 +228,10 @@ void RR(int job_cnt) {
 
 	push(q->list, &jobs[0]);				// put first job into list
 
-	int next = 1;
 	while (jobs[next - 1].arrival_time == jobs[next].arrival_time) {	// check if there are any jobs arriving at the same time
 		push(q->list, &jobs[next++]);
 	}
-
-	int current_time = 0;                   
+                 
 	while (!isEmpty(q->list)) {
 		JOB* cur_job = pop(q->list);			// select job
 		cur_job->time_quantum = q->time_quantum;	// allocate time quantum
@@ -258,7 +264,10 @@ void RR(int job_cnt) {
 MLFQ - multiple priority queues, boosting
 */
 void MLFQ(int job_cnt, int tq_level) {
+	int total_time = 0;
+	int current_time = 0;
 	int flag = 0;
+	int next = 1;
 
 	Queue** q = (Queue**)malloc(sizeof(Queue*) * MAX_QUEUE);
 	for (int i = 0; i < MAX_QUEUE; i++) {
@@ -269,7 +278,7 @@ void MLFQ(int job_cnt, int tq_level) {
 	}
 
 	JOB* jobs = (JOB*)malloc(sizeof(JOB) * job_cnt);		// to create workload
-	int total_time = create_workload(jobs, job_cnt);		// create workload, get total service time
+	total_time = create_workload(jobs, job_cnt);		// create workload, get total service time
 
 	init(job_cnt, total_time);					// initialize footprints
 
@@ -288,12 +297,10 @@ void MLFQ(int job_cnt, int tq_level) {
 	sort_by_arrival_time(jobs, job_cnt);				// sort by arrival time
 	push(q[0]->list, &jobs[0]);					// put first job into the topmost queue
 
-	int next = 1;
 	while (jobs[next - 1].arrival_time == jobs[next].arrival_time) {	// check if there are any jobs arriving at the same time
 		push(q[0]->list, &jobs[next++]);
 	}
 
-	int current_time = 0;
 	while (current_time < total_time) {
 		Queue* mq = q[0];
 		while (mq && isEmpty(mq->list)) {			// select queue
@@ -376,13 +383,17 @@ void MLFQ(int job_cnt, int tq_level) {
 Lottery scheduling - tickets, schedule a job who wins the lottery
 */
 void Lottery(int job_cnt) {
+	int total_time = 0;
+	int current_time = 0;
+	int total_tickets = 0;
+
 	Queue* q = (Queue*)malloc(sizeof(Queue));
 	q->list = (JOB_LIST*)malloc(sizeof(JOB_LIST));
 	q->list->head = NULL;
 	q->list->tail = NULL;
 
 	JOB* jobs = (JOB*)malloc(sizeof(JOB) * job_cnt);		// for workload
-	int total_time = create_workload(jobs, job_cnt);		// create workload, get total service time
+	total_time = create_workload(jobs, job_cnt);		// create workload, get total service time
 
 	init(job_cnt, total_time);					// initialize footprints
 
@@ -390,14 +401,12 @@ void Lottery(int job_cnt) {
 		push(q->list, &jobs[i]);				// push workload 
 	}
     
-	int total_tickets = 0;
 	for (JOB* cur_job = q->list->head; cur_job; cur_job = cur_job->next) {	// set each job's ticket
 		printf("Enter %c's tickets : ", cur_job->name);
 		scanf("%d", &cur_job->tickets);
 		total_tickets = total_tickets + cur_job->tickets;
 	}
 
-	int current_time = 0;
 	srand(time(NULL));
 	while (current_time < total_time) {
 		int lottery = rand() % total_tickets;			// generate random value between 0 and the total # of tickets
