@@ -95,25 +95,10 @@ int create_workload(JOB* jobs, int job_cnt) {
 		printf("Enter job %c's Arrival Time and Service TIme: ", jobs[i].name);
 		scanf("%d %d", &jobs[i].arrival_time, &jobs[i].service_time);
 		total_service_time += jobs[i].service_time;
+		jobs[i].time_quantum = 0;			// for MLFQ scheduling
 	}
 
 	return total_service_time;
-
-    /*
-    for (int i = 0; i < job_cnt; i++) {
-        jobs[i].arrival_time = 2 * i;
-        jobs[i].name = 'A' + i;
-    }
-
-    jobs[0].service_time = 3;
-    jobs[1].service_time = 6;
-    jobs[2].service_time = 4;
-    jobs[3].service_time = 5;
-    jobs[4].service_time = 2;
-
-    return 20;
-    */
-    
 }
 
 void sort_by_arrival_time(JOB* jobs, int job_cnt) {
@@ -121,9 +106,9 @@ void sort_by_arrival_time(JOB* jobs, int job_cnt) {
 		int idx = i;
 
 		for (int j = i + 1; j < job_cnt; j++) {
-			if (jobs[idx].arrival_time > jobs[j].arrival_time)          // sort by arrival time
+			if (jobs[idx].arrival_time > jobs[j].arrival_time)		// sort by arrival time
 				idx = j;
-			else if (jobs[idx].arrival_time == jobs[j].arrival_time) {  // tie-break rule
+			else if (jobs[idx].arrival_time == jobs[j].arrival_time) {	// tie-break rule
 				if (jobs[idx].name > jobs[j].name)
 					idx = j;
 			}
@@ -143,9 +128,9 @@ void sort_by_service_time(JOB* jobs, int start_idx, int prev_job_end_time, int j
         for (int j = i + 1; j < job_cnt; j++) {
             if (jobs[j].arrival_time > prev_job_end_time) continue;
 
-            if (jobs[idx].service_time > jobs[j].service_time)          // sort by service time
+            if (jobs[idx].service_time > jobs[j].service_time)		// sort by service time
                 idx = j;
-            else if (jobs[idx].service_time == jobs[j].service_time) {  // tie-break rule
+            else if (jobs[idx].service_time == jobs[j].service_time) {	// tie-break rule
                 if (jobs[idx].name > jobs[j].name)
                     idx = j;
             }
@@ -163,24 +148,24 @@ FIFO scheduling - Non-preemptive, Single Queue
 */
 void FIFO(int job_cnt) {
 	Queue* q = (Queue*)malloc(sizeof(Queue));
-	q->jobs = (JOB*)malloc(sizeof(JOB) * job_cnt);                  // workload
-	int total_time = create_workload(q->jobs, job_cnt);             // create workload, get total service time
+	q->jobs = (JOB*)malloc(sizeof(JOB) * job_cnt);		// workload
+	int total_time = create_workload(q->jobs, job_cnt);		// create workload, get total service time
     
-	init(job_cnt, total_time);                                      // initialize footprints
+	init(job_cnt, total_time);					// initialize footprints
 
-	sort_by_arrival_time(q->jobs, job_cnt);                         // sort by arrival time or sort alphabetically if processes arrive at the same time
+	sort_by_arrival_time(q->jobs, job_cnt);			// sort by arrival time or sort alphabetically if processes arrive at the same time
 
 	int current_time = 0;
 	for (int i = 0; i < job_cnt; i++) {
 		JOB* cur_job = &q->jobs[i];
 
 		while (cur_job->service_time--) {
-			footprints[cur_job->name - 'A'][current_time++] = 1;    // run state
+			footprints[cur_job->name - 'A'][current_time++] = 1;	// run state
 		}
 	}
 
 	printf("-------------------FIFO-------------------\n");
-	print_job(footprints, job_cnt, total_time);                     // simulate FIFO scheduling
+	print_job(footprints, job_cnt, total_time);			// simulate FIFO scheduling
 
 	free(q->jobs);
 }
@@ -190,22 +175,22 @@ SJF scheduling - Non-preemptive, Single Queue, jobs that finish quickly have hig
 */
 void SJF(int job_cnt) {
 	Queue* q = (Queue*)malloc(sizeof(Queue));
-	q->jobs = (JOB*)malloc(sizeof(JOB) * job_cnt);                      // workload
-	int total_time = create_workload(q->jobs, job_cnt);                 // create workload, get total service time
+	q->jobs = (JOB*)malloc(sizeof(JOB) * job_cnt);		// workload
+	int total_time = create_workload(q->jobs, job_cnt);		// create workload, get total service time
 
-	init(job_cnt, total_time);                                          // initialize footprints
+	init(job_cnt, total_time);					// initialize footprints
 
-	sort_by_service_time(q->jobs, 0, 0, job_cnt);                       // sort by arrival time and service time to select first job
+	sort_by_service_time(q->jobs, 0, 0, job_cnt);			// sort by arrival time and service time to select first job
 
 	int current_time = 0;
 	for (int i = 0; i < job_cnt; i++) {
 		JOB* cur_job = &q->jobs[i];
 
 		while (cur_job->service_time--) {
-			footprints[cur_job->name - 'A'][current_time++] = 1;        // run state
+			footprints[cur_job->name - 'A'][current_time++] = 1;	// run state
 		}
 
-		sort_by_service_time(q->jobs, i + 1, current_time, job_cnt);    // sort by service time to select next job
+		sort_by_service_time(q->jobs, i + 1, current_time, job_cnt);	// sort by service time to select next job
 	}
 
 	printf("-------------------SJF-------------------\n");
@@ -219,46 +204,46 @@ RR scheduling - preemptive, job runs during the time quantum, expected RR need a
 */
 void RR(int job_cnt) {
 	Queue* q = (Queue*)malloc(sizeof(Queue));
-	q->list = (JOB_LIST*)malloc(sizeof(JOB_LIST));          // create linkedlist
+	q->list = (JOB_LIST*)malloc(sizeof(JOB_LIST));	// create linkedlist
 	q->list->head = NULL;
 	q->list->tail = NULL;   
-
-	JOB* jobs = (JOB*)malloc(sizeof(JOB) * job_cnt);        // to create workload
-	int total_time = create_workload(jobs, job_cnt);        // create workload, get total service time
-
-	init(job_cnt, total_time);                              // initialize footprints
-
-	printf("Enter time quantum: ");
+	
+	printf("Enter time quantum: ");			// set time quantum
 	scanf("%d", &q->time_quantum);
-    
-	sort_by_arrival_time(jobs, job_cnt);                    // basically, the process that arrives first is performed first
 
-	push(q->list, &jobs[0]);                                // put first job into list
+	JOB* jobs = (JOB*)malloc(sizeof(JOB) * job_cnt);	// to create workload
+	int total_time = create_workload(jobs, job_cnt);	// create workload, get total service time
+
+	init(job_cnt, total_time);				// initialize footprints
+    
+	sort_by_arrival_time(jobs, job_cnt);			// basically, the process that arrives first is performed first
+
+	push(q->list, &jobs[0]);				// put first job into list
 
 	int next = 1;
-	while (jobs[next - 1].arrival_time == jobs[next].arrival_time) {  // check if there are any jobs arriving at the same time
-		push(q->list, &jobs[next]);
-		next++;
+	while (jobs[next - 1].arrival_time == jobs[next].arrival_time) {	// check if there are any jobs arriving at the same time
+		push(q->list, &jobs[next++]);
 	}
 
 	int current_time = 0;                   
 	while (!isEmpty(q->list)) {
-		JOB* cur_job = pop(q->list);                           // select job
+		JOB* cur_job = pop(q->list);			// select job
+		cur_job->time_quantum = q->time_quantum;	// allocate time quantum
 
-		for (int i = 0; i < q->time_quantum; i++) {
+		while (cur_job->time_quantum--) {
 			cur_job->service_time--;
 			if (cur_job->service_time >= 0) {
-				footprints[cur_job->name - 'A'][current_time++] = 1;    // run state
+				footprints[cur_job->name - 'A'][current_time++] = 1;	// run state
 			}
 			else
 				break;
 
-			if (current_time == jobs[next].arrival_time)               // push arrived job
+			if (current_time == jobs[next].arrival_time)	// push arrived job
 				push(q->list, &jobs[next++]);
 
 		}
 
-		if (cur_job->service_time > 0)                               // cases with remaining time quantum
+		if (cur_job->service_time > 0)			// cases with remaining time quantum
 			push(q->list, cur_job);
 	}
 
@@ -273,22 +258,24 @@ void RR(int job_cnt) {
 MLFQ - multiple priority queues, boosting
 */
 void MLFQ(int job_cnt, int tq_level) {
+	int flag = 0;
+
 	Queue** q = (Queue**)malloc(sizeof(Queue*) * MAX_QUEUE);
 	for (int i = 0; i < MAX_QUEUE; i++) {
-		q[i] = (Queue*)malloc(sizeof(Queue));               // create multi queue
+		q[i] = (Queue*)malloc(sizeof(Queue));			// create multi queue
 		q[i]->list = (JOB_LIST*)malloc(sizeof(JOB_LIST));
 		q[i]->list->head = NULL;
 		q[i]->list->tail = NULL;
 	}
 
-	JOB* jobs = (JOB*)malloc(sizeof(JOB) * job_cnt);        // to create workload
-	int total_time = create_workload(jobs, job_cnt);        // create workload, get total service time
+	JOB* jobs = (JOB*)malloc(sizeof(JOB) * job_cnt);		// to create workload
+	int total_time = create_workload(jobs, job_cnt);		// create workload, get total service time
 
-	init(job_cnt, total_time);                              // initialize footprints
+	init(job_cnt, total_time);					// initialize footprints
 
 	for (int i = 0; i < MAX_QUEUE; i++) {
 		q[i]->time_quantum = 1;
-		for (int j = 0; j < i && j < tq_level - 1; j++)     // setting time quantum
+		for (int j = 0; j < i && j < tq_level - 1; j++)	// setting time quantum
 			q[i]->time_quantum *= 2;
 
 		// link lower priority queue
@@ -298,63 +285,76 @@ void MLFQ(int job_cnt, int tq_level) {
 			q[i]->next_queue = NULL;
 	}
 
-	sort_by_arrival_time(jobs, job_cnt);                    // sort by arrival time
-	push(q[0]->list, &jobs[0]);                             // put first job into the topmost queue
+	sort_by_arrival_time(jobs, job_cnt);				// sort by arrival time
+	push(q[0]->list, &jobs[0]);					// put first job into the topmost queue
 
 	int next = 1;
-	while (jobs[next - 1].arrival_time == jobs[next].arrival_time) {  // check if there are any jobs arriving at the same time
+	while (jobs[next - 1].arrival_time == jobs[next].arrival_time) {	// check if there are any jobs arriving at the same time
 		push(q[0]->list, &jobs[next++]);
 	}
 
-	int time = 0;
-	while (time < total_time) {
+	int current_time = 0;
+	while (current_time < total_time) {
 		Queue* mq = q[0];
-		while (mq && isEmpty(mq->list)) {                         // select queue
+		while (mq && isEmpty(mq->list)) {			// select queue
 			mq = mq->next_queue;
 		}
 
 		JOB* cur_job = pop(mq->list);
-		for (int i = 0; i < mq->time_quantum; i++) {
+		if(cur_job->time_quantum <= 0)
+			cur_job->time_quantum = mq->time_quantum;	// allocate time quantum
+		while (cur_job->time_quantum--) {
 			cur_job->service_time--;
 			if (cur_job->service_time >= 0) {
-				footprints[cur_job->name - 'A'][time++] = 1;     // run state
+				footprints[cur_job->name - 'A'][current_time++] = 1;	// run state
+			}
+			else {
+				break;							// terminated
 			}
 
-			if (jobs[next].arrival_time == time) {
-				push(q[0]->list, &jobs[next++]);                 // newly arrived job goes to queue 0
+			if (jobs[next].arrival_time == current_time) {
+				push(q[0]->list, &jobs[next++]);	// newly arrived job goes to queue 0
+			}
+			
+			flag = 0;	// for checking if all queues are empty
+			for(Queue* seekq = q[0]; seekq; seekq = seekq->next_queue) {
+				if(!isEmpty(seekq->list)) {
+					flag = 1;
+					break;
+				}
+			}
+			
+			if(!flag) {	// if all queues are empty
+				cur_job->time_quantum = mq->time_quantum;	// cotinue to run same process
+				continue;
 			}
 
 			// boosting
-			if (time && time % BOOSTING_PERIOD == 0) {           // if it is a boosting period
-				Queue* seekq = q[1];                             // seek jobs starting from the queue 1
+			if (current_time && current_time % BOOSTING_PERIOD == 0) {	// if it is a boosting period
+				Queue* seekq = q[1];			// seek jobs starting from the queue 1
 				while (seekq) {
 					while (!isEmpty(seekq->list)) {
-						push(q[0]->list, pop(seekq->list));     // move all the jobs to the topmost queue
+						push(q[0]->list, pop(seekq->list));	// move all the jobs to the topmost queue
 					}
-					seekq = seekq->next_queue;                  // move to lower queue
+					seekq = seekq->next_queue;			// move to lower queue
 				}
 			}
         	}
+        	
+        	if(cur_job->service_time > 0 && cur_job->time_quantum > 0) {			// if the time quantum is not used up, keep its priority
+        		push(mq->list, cur_job);
+        		continue;
+        	}
 
-		int flag = 0;   // for checking if all queues are empty
-		for (int i = 0; i < MAX_QUEUE; i++) {
-			if (!isEmpty(q[i]->list))
-				flag = 1;
-		}
-
-		if (flag) {     // means some queues have jobs
+		if (flag) {						// means some queues have jobs
 			if (cur_job->service_time > 0) {
-				if (!mq->next_queue) {                              // if mq is last level queue
+				if (!mq->next_queue) {			// if mq is last level queue
 					push(mq->list, cur_job);
 				}
 				else {
-					push(mq->next_queue->list, cur_job);            // push job into lower queue
+					push(mq->next_queue->list, cur_job);	// push job into lower queue
 				}
 			}
-		}
-		else {          // means all queues are empty
-			if (cur_job->service_time > 0)
-				push(mq->list, cur_job);                            // push job into the topmost queue again
 		}
 	}
 
@@ -373,7 +373,7 @@ void MLFQ(int job_cnt, int tq_level) {
 }
 
 /*
-Lottery scheduling - ticket, schedule a job who wins the lottery
+Lottery scheduling - tickets, schedule a job who wins the lottery
 */
 void Lottery(int job_cnt) {
 	Queue* q = (Queue*)malloc(sizeof(Queue));
@@ -381,17 +381,17 @@ void Lottery(int job_cnt) {
 	q->list->head = NULL;
 	q->list->tail = NULL;
 
-	JOB* jobs = (JOB*)malloc(sizeof(JOB) * job_cnt);        // for workload
-	int total_time = create_workload(jobs, job_cnt);        // create workload, get total service time
+	JOB* jobs = (JOB*)malloc(sizeof(JOB) * job_cnt);		// for workload
+	int total_time = create_workload(jobs, job_cnt);		// create workload, get total service time
 
-	init(job_cnt, total_time);                              // initialize footprints
+	init(job_cnt, total_time);					// initialize footprints
 
 	for (int i = 0; i < job_cnt; i++) {                     
-		push(q->list, &jobs[i]);                            // push workload 
+		push(q->list, &jobs[i]);				// push workload 
 	}
     
 	int total_tickets = 0;
-	for (JOB* cur_job = q->list->head; cur_job; cur_job = cur_job->next) {       // set each job's ticket
+	for (JOB* cur_job = q->list->head; cur_job; cur_job = cur_job->next) {	// set each job's ticket
 		printf("Enter %c's tickets : ", cur_job->name);
 		scanf("%d", &cur_job->tickets);
 		total_tickets = total_tickets + cur_job->tickets;
@@ -400,7 +400,7 @@ void Lottery(int job_cnt) {
 	int current_time = 0;
 	srand(time(NULL));
 	while (current_time < total_time) {
-		int lottery = rand() % total_tickets;             // generate random value between 0 and the total # of tickets
+		int lottery = rand() % total_tickets;			// generate random value between 0 and the total # of tickets
 		int sum = 0;
 
 		JOB* cur_job = q->list->head;
@@ -411,9 +411,9 @@ void Lottery(int job_cnt) {
 			cur_job = cur_job->next;
 		}
 
-		if (cur_job->service_time > 0) {
+		if (cur_job->service_time > 0 && cur_job->arrival_time <= current_time) {
 			cur_job->service_time--;
-			footprints[cur_job->name - 'A'][current_time++] = 1;      // run state
+			footprints[cur_job->name - 'A'][current_time++] = 1;		// run state
 		}
 	}
 	
