@@ -3,7 +3,7 @@
 ## Lab1 - scheduling simulator
 
 ### How to use
-
+---------------
   ```
   $ git clone https://github.com/kykapple/OS_lab.git
   $ cd lab1_sched
@@ -13,7 +13,7 @@
   
   
 ### Scheduling Algorithm Summary
-
+---------------
 #### FIFO
 - Schedule a process that arrives first
 - Non-preemptive
@@ -36,7 +36,7 @@
 
 
 ### Scheduling Algorithm Simulation
-
+---------------
 #### Workload
 | Process | Arrival Time  | Service Time  |
 |---------|---------------|---------------|
