@@ -396,15 +396,15 @@ void Lottery(int job_cnt) {
 	total_time = create_workload(jobs, job_cnt);		// create workload, get total service time
 
 	init(job_cnt, total_time);					// initialize footprints
-
+    
+	for (int i=0; i<job_cnt; i++) {	// set each job's ticket
+		printf("Enter %c's tickets : ", jobs[i].name);
+		scanf("%d", &jobs[i].tickets);
+		total_tickets = total_tickets + jobs[i].tickets;
+	}
+	
 	for (int i = 0; i < job_cnt; i++) {                     
 		push(q->list, &jobs[i]);				// push workload 
-	}
-    
-	for (JOB* cur_job = q->list->head; cur_job; cur_job = cur_job->next) {	// set each job's ticket
-		printf("Enter %c's tickets : ", cur_job->name);
-		scanf("%d", &cur_job->tickets);
-		total_tickets = total_tickets + cur_job->tickets;
 	}
 
 	srand(time(NULL));
