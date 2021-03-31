@@ -11,7 +11,7 @@
   $ ./lab1_sched
   ```
   
-### Scheduling Algorithm
+### Scheduling Algorithm Summary
 
 #### FIFO
 - Schedule a process that arrives first
@@ -32,3 +32,17 @@
 
 #### Lottery
 - Schedule a job who wins the lottery
+
+### Scheduling Algorithm Simulation
+
+#### Workload
+| Process | Arrival Time  | Service Time  |
+|---------|---------------|---------------|
+|    A    |      0        |       3       |
+|    B    |      2        |       6       |
+|    C    |      4        |       4       |
+|    D    |      6        |       5       |
+|    E    |      8        |       2       |
+
+#### FIFO
+<img src=">
