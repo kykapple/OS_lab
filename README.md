@@ -11,6 +11,7 @@
   $ ./lab1_sched
   ```
   
+  
 ### Scheduling Algorithm Summary
 
 #### FIFO
@@ -33,6 +34,7 @@
 #### Lottery
 - Schedule a job who wins the lottery
 
+
 ### Scheduling Algorithm Simulation
 
 #### Workload
@@ -45,4 +47,23 @@
 |    E    |      8        |       2       |
 
 #### FIFO
-<img src=">
+![FIFO_1](https://user-images.githubusercontent.com/76088639/113154865-68ad1500-9273-11eb-85c9-0be42939ce04.PNG)
+
+#### SJF
+![SJF_1](https://user-images.githubusercontent.com/76088639/113154908-75316d80-9273-11eb-8daf-a8893f1b8760.PNG)
+
+#### RR - time quantum 1
+![RR_1](https://user-images.githubusercontent.com/76088639/113154928-7a8eb800-9273-11eb-8e52-a40955e9e3c8.PNG)
+
+#### RR - time quantum 4
+![RR_4](https://user-images.githubusercontent.com/76088639/113154935-7bbfe500-9273-11eb-893c-62c34c2437b1.PNG)
+
+#### MLFQ - time quantum 1
+![MLFQ_1](https://user-images.githubusercontent.com/76088639/113154943-7e223f00-9273-11eb-884b-5619b3afb997.PNG)
+
+#### MLFQ - time quantum 2^i
+![MLFQ_4](https://user-images.githubusercontent.com/76088639/113154948-7f536c00-9273-11eb-8bca-c1230fffec8c.PNG)
+
+#### Lottery
+![24p 완벽띠](https://user-images.githubusercontent.com/76088639/113155028-909c7880-9273-11eb-9029-d18e89efe1d9.PNG)
+
