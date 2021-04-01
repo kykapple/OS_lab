@@ -1,6 +1,6 @@
 # OS_lab
 
-## Lab1 - scheduling simulator
+## 1. Lab1 - scheduling simulator
 
 ### How to use
 ---------------
