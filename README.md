@@ -79,6 +79,6 @@
   $ ./lab2_sync -c=N -q=TQ (N = Number of vehicles, TQ = time quantum)
   ```
   
-### Concurrent Data Structure
+### Concurrent Issue
 --------------
 #### Producer/Consumer Problem
