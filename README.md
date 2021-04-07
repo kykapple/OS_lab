@@ -1,6 +1,6 @@
 # OS_lab
 
-## 1. Lab1 - scheduling simulator
+## 1. Lab1 - Scheduling Simulator
 
 ### How to use
 ---------------
@@ -68,3 +68,17 @@
 #### Lottery
 ![24p 완벽띠](https://user-images.githubusercontent.com/76088639/113155028-909c7880-9273-11eb-9029-d18e89efe1d9.PNG)
 
+## 2. Lab2 - Concurrent Data Structure
+
+### How to use
+---------------
+  ```
+  $ git clone https://github.com/kykapple/OS_lab.git
+  $ cd Lab2
+  $ make all
+  $ ./lab2_sync -c=N -q=TQ (N = Number of vehicles, TQ = time quantum)
+  ```
+  
+### Concurrent Data Structure
+--------------
+#### Producer/Consumer Problem
