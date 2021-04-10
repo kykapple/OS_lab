@@ -172,6 +172,8 @@ void* Consume(void *arg) {
 	while(1) {
 		if(car_queue->produce_number == total_car && car_queue->balance == 0) break;
 			
+		while(coarse_car_queue->produce_number < total_car && coarse_car_queue->balance == 0);	
+			
 		// Dequeue only possible when the consumer and vehicle number match
 		if(!isEmpty(car_queue) && *consumer_num == car_queue->front->car_num) {
 			int my_car = Dequeue(car_queue);
@@ -258,7 +260,7 @@ void* fg_Consume(void* arg) {
 	
 	while(1) {
 		if(fine_car_queue->produce_number == total_car && fine_car_queue->balance == 0) break;
-	//	sleep(1);
+
 		pthread_mutex_lock(&fine_car_queue->mutex);
 		
 		while(fine_car_queue->produce_number < total_car && fine_car_queue->balance == 0) {
@@ -460,6 +462,6 @@ int main(int argc, char* argv[]) {
 	printf("\tTotal Produce Number = %d\n", fine_car_queue->produce_number);
 	printf("\tFinal Balance Value = %d\n", fine_car_queue->balance);
 	printf("\tExecution time = %f -> %ldsec:%ldusec\n", result_fgT, fg_gap.tv_sec, fg_gap.tv_usec);
-		
+	
 	return 0;
 }
