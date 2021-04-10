@@ -35,13 +35,20 @@ typedef struct Node {
 
 typedef struct car_queue {
 	int balance;
-	int total_produce_number;
+	int produce_number;
 	Node* front;
 	Node* rear;
+	
+	pthread_mutex_t mutex;
+	/*
+	* test find-grained
+	*/
+	pthread_mutex_t headLock;
+	pthread_mutex_t tailLock;
 }CQ;
 
-pthread_cond_t fill, empty;
-pthread_mutex_t mutex;
+pthread_cond_t cg_fill, cg_empty;
+pthread_cond_t fg_fill, fg_empty;
 
 /*
  * You need to Declare functions in  here
