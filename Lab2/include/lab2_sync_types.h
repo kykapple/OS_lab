@@ -41,7 +41,7 @@ typedef struct car_queue {
 	
 	pthread_mutex_t mutex;
 	/*
-	* test find-grained
+	* find-grained
 	*/
 	pthread_mutex_t headLock;
 	pthread_mutex_t tailLock;
@@ -53,8 +53,25 @@ pthread_cond_t fg_fill, fg_empty;
 /*
  * You need to Declare functions in  here
  */
+ 
+void print(CQ* current_queue);
+int isEmpty(CQ* current_queue);
 
+void Init();
+void cg_Init();
+void fg_Init();
+
+void Enqueue();
+int Dequeue(CQ* current_queue);
+void fg_Enqueue();
+int fg_Dequeue();
+
+void* Produce(void* arg);
+void* Consume(void* arg);
+void* cg_Produce(void* arg);
+void* cg_Consume(void* arg);
+void* fg_Produce(void* arg);
+void* fg_Consume(void* arg);
 
 #endif /* LAB2_HEADER_H*/
-
 

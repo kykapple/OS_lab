@@ -38,19 +38,19 @@ CQ* coarse_car_queue = NULL;	// Coarse-grained Lock
 CQ* fine_car_queue = NULL;	// Fine-grained Lock
 int total_car;
 
-/*
-void print(CQ* car_queue) {
-	Node* cur = car_queue->front;
+
+void print(CQ* current_queue) {
+	Node* cur = current_queue->front;
 	while(cur) {
 		printf("%d ", cur->car_num);
 		cur = cur->next;
 	}
 	printf("\n");
 }
-*/
 
-int isEmpty(CQ* car_queue) {
-	return car_queue->front == NULL ? 1 : 0;	// if queue is empty return 1
+
+int isEmpty(CQ* current_queue) {
+	return current_queue->front == NULL ? 1 : 0;	// if queue is empty return 1
 }
 
 // Without Lock initializer
