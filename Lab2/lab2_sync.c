@@ -291,9 +291,7 @@ void* fg_Consume(void* arg) {
 		pthread_mutex_lock(&fine_car_queue->headLock);
 		if(!isEmpty(fine_car_queue) && *consumer_num == fine_car_queue->front->car_num) { 
 			int my_car = fg_Dequeue();
-			pthread_mutex_lock(&fine_car_queue->mutex);
 			pthread_cond_signal(&fg_empty);
-			pthread_mutex_unlock(&fine_car_queue->mutex);
 		}		
 		pthread_mutex_unlock(&fine_car_queue->headLock);
 	}
