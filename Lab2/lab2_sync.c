@@ -191,9 +191,11 @@ void* cg_Produce(void* arg) {
 		int tq = *time_quantum;		
 		sleep(tq/100);		// time it takes to release the vehicle
 		
-		while(coarse_car_queue->balance == MAX_SIZE)
-			pthread_cond_wait(&cg_empty, &coarse_car_queue->mutex);
+		while(coarse_car_queue->balance == MAX_SIZE) {
 			
+			pthread_cond_wait(&cg_empty, &coarse_car_queue->mutex);
+		}
+		
 		Enqueue(coarse_car_queue, (coarse_car_queue->produce_number % CONSUMER_SIZE) +1);
 		coarse_car_queue->produce_number++;
 		
@@ -238,7 +240,6 @@ void* fg_Produce(void* arg) {
 		pthread_mutex_lock(&fine_car_queue->mutex);
 		
 		while(fine_car_queue->balance == MAX_SIZE) {
-			pthread_cond_broadcast(&fg_fill);
 			pthread_cond_wait(&fg_empty, &fine_car_queue->mutex);		
 		}
 		
@@ -263,22 +264,10 @@ void* fg_Consume(void* arg) {
 
 		pthread_mutex_lock(&fine_car_queue->mutex);
 		
-		while(fine_car_queue->produce_number < total_car && fine_car_queue->balance == 0) {
+		while(fine_car_queue->produce_number < total_car && fine_car_queue->balance == 0) 
 			pthread_cond_wait(&fg_fill, &fine_car_queue->mutex);
-		}
 		
 		pthread_mutex_unlock(&fine_car_queue->mutex);
-		
-		while(fine_car_queue->produce_number < total_car) {
-			if(!isEmpty(fine_car_queue) && fine_car_queue->front->car_num == *consumer_num) break;	
-			
-			pthread_mutex_lock(&fine_car_queue->mutex);
-			
-			while (fine_car_queue->produce_number < total_car && !isEmpty(fine_car_queue) && fine_car_queue->front->car_num != *consumer_num) {
-				pthread_cond_wait(&fg_fill, &fine_car_queue->mutex);
-			}
-			pthread_mutex_unlock(&fine_car_queue->mutex);
-		}
 		
 		// Dequeue only possible when the consumer and vehicle number match
 		pthread_mutex_lock(&fine_car_queue->headLock);
@@ -411,8 +400,11 @@ int main(int argc, char* argv[]) {
 	printf("\tTotal Produce Number = %d\n", coarse_car_queue->produce_number);
 	printf("\tFinal Balance Value = %d\n", coarse_car_queue->balance);
 	printf("\tExecution time = %f -> %ldsec:%ldusec\n", result_cgT, cg_gap.tv_sec, cg_gap.tv_usec);
+
 	
 	/////////////// Fine-grained lock ver ///////////////
+//	double avg = 0;
+//	for(int i=0; i<10; i++) {
 	struct timeval fg_start, fg_end, fg_gap;
 	int fg_status = 0;
 	pthread_t fg_Producer;
@@ -447,6 +439,12 @@ int main(int argc, char* argv[]) {
 		fg_gap.tv_sec -= 1; 
 		fg_gap.tv_usec += 1000000;
 	}
+	
+//	avg += result_fgT;
+//	printf("Execution Time : %f\n", result_fgT);
+//	}
+//	avg /= 10.0;
+//	printf("Average Execution Time : %f\n", avg);
 	
 	printf("(3) Fine-grained Lock Experiment\n");
 	printf("Experiment Info\n");
