@@ -237,11 +237,9 @@ void* fg_Produce(void* arg) {
 		int tq = *time_quantum;		
 		sleep(tq/100);		// time it takes to release the vehicle
 		
-		printf("producer before lock\n");
 		pthread_mutex_lock(&fine_car_queue->mutex);
 		
 		while(fine_car_queue->balance == MAX_SIZE) {
-			printf("producer before wait queue is full!!!\n");
 			pthread_cond_wait(&fg_empty, &fine_car_queue->mutex);		
 		}
 		
@@ -253,8 +251,6 @@ void* fg_Produce(void* arg) {
 		else 
 			pthread_cond_broadcast(&fg_fill);	// means producer released all vehicles
 		
-		printf("producer made the car !!! ->");
-		print(fine_car_queue);
 		pthread_mutex_unlock(&fine_car_queue->mutex);	
 	}
 }
@@ -266,13 +262,10 @@ void* fg_Consume(void* arg) {
 	while(1) {
 		if(fine_car_queue->produce_number == total_car && fine_car_queue->balance == 0) break;
 		
-		printf("%d consumer before lock\n", *consumer_num);
 		pthread_mutex_lock(&fine_car_queue->mutex);
 		
-		while(fine_car_queue->produce_number < total_car && fine_car_queue->balance == 0) {
-			printf("%d consumer before wait queue is empty!!!!\n", *consumer_num);
+		while(fine_car_queue->produce_number < total_car && fine_car_queue->balance == 0)
 			pthread_cond_wait(&fg_fill, &fine_car_queue->mutex);
-}		
 
 		pthread_mutex_unlock(&fine_car_queue->mutex);
 		
@@ -280,12 +273,9 @@ void* fg_Consume(void* arg) {
 		pthread_mutex_lock(&fine_car_queue->headLock);
 		if(!isEmpty(fine_car_queue) && *consumer_num == fine_car_queue->front->car_num) { 
 			int my_car = fg_Dequeue();
-			printf("%d consumer get car", *consumer_num);
-			print(fine_car_queue);
 			pthread_cond_signal(&fg_empty);
 		}		
 		pthread_mutex_unlock(&fine_car_queue->headLock);
-		printf("%d consumer is going up again produce number :%d balance : %d\n", *consumer_num, fine_car_queue->produce_number, fine_car_queue->balance);
 	}
 }
 
