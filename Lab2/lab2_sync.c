@@ -270,14 +270,7 @@ void* fg_Consume(void* arg) {
 		pthread_mutex_unlock(&fine_car_queue->mutex);
 		
 		while(fine_car_queue->produce_number < total_car) {
-			pthread_mutex_lock(&fine_car_queue->headLock);
-			
-			if(!isEmpty(fine_car_queue) && fine_car_queue->front->car_num == *consumer_num) {
-				pthread_mutex_unlock(&fine_car_queue->headLock);
-				break;
-			}	
-			
-			pthread_mutex_unlock(&fine_car_queue->headLock);
+			if(!isEmpty(fine_car_queue) && fine_car_queue->front->car_num == *consumer_num) break;	
 			
 			pthread_mutex_lock(&fine_car_queue->mutex);
 			
