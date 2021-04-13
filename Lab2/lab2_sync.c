@@ -130,7 +130,6 @@ void fg_Enqueue(int car_num) {
 	newNode->car_num = car_num;
 	newNode->next = NULL;
 	
-	pthread_mutex_lock(&fine_car_queue->tailLock);
 	if(fine_car_queue->front == NULL)
 		fine_car_queue->front = newNode;
 	else
@@ -138,7 +137,6 @@ void fg_Enqueue(int car_num) {
 	
 	fine_car_queue->rear = newNode;
 	fine_car_queue->balance++;
-	pthread_mutex_unlock(&fine_car_queue->tailLock);
 }
 
 // Fine-grained Lock Dequeue
@@ -196,11 +194,11 @@ void* cg_Produce(void* arg) {
 		while(coarse_car_queue->balance == MAX_SIZE)
 			pthread_cond_wait(&cg_empty, &coarse_car_queue->mutex);
 		
-		Enqueue(coarse_car_queue, (coarse_car_queue->produce_number % CONSUMER_SIZE) +1);
-		coarse_car_queue->produce_number++;
-		
-		if(coarse_car_queue->produce_number < total_car)
+		if(coarse_car_queue->produce_number < total_car) {
+			Enqueue(coarse_car_queue, (coarse_car_queue->produce_number % CONSUMER_SIZE) +1);
+			coarse_car_queue->produce_number++;
 			pthread_cond_signal(&cg_fill);
+		}
 		else
 			pthread_cond_broadcast(&cg_fill);	// means producer released all vehicles
 		pthread_mutex_unlock(&coarse_car_queue->mutex);
@@ -239,10 +237,18 @@ void* fg_Produce(void* arg) {
 		pthread_mutex_lock(&fine_car_queue->mutex);
 		
 		while(fine_car_queue->balance == MAX_SIZE) 
-			pthread_cond_wait(&fg_empty, &fine_car_queue->mutex);		
+			pthread_cond_wait(&fg_empty, &fine_car_queue->mutex);
+			
+		pthread_mutex_unlock(&fine_car_queue->mutex);			
 		
-		fg_Enqueue((fine_car_queue->produce_number % CONSUMER_SIZE) +1);
-		fine_car_queue->produce_number++;
+		pthread_mutex_lock(&fine_car_queue->tailLock);
+		if(fine_car_queue->produce_number < total_car) {
+			fg_Enqueue((fine_car_queue->produce_number % CONSUMER_SIZE) +1);
+			fine_car_queue->produce_number++;
+		}
+		pthread_mutex_unlock(&fine_car_queue->tailLock);
+		
+		pthread_mutex_lock(&fine_car_queue->mutex);
 		
 		if(fine_car_queue->produce_number < total_car)
 			pthread_cond_signal(&fg_fill);
@@ -271,7 +277,9 @@ void* fg_Consume(void* arg) {
 		pthread_mutex_lock(&fine_car_queue->headLock);
 		if(!isEmpty(fine_car_queue) && *consumer_num == fine_car_queue->front->car_num) { 
 			int my_car = fg_Dequeue();
+			pthread_mutex_lock(&fine_car_queue->mutex);
 			pthread_cond_signal(&fg_empty);
+			pthread_mutex_unlock(&fine_car_queue->mutex);
 		}		
 		pthread_mutex_unlock(&fine_car_queue->headLock);
 	}
@@ -360,7 +368,7 @@ int main(int argc, char* argv[]) {
 	/////////////// Coarse-grained lock ver ///////////////
 	struct timeval cg_start, cg_end, cg_gap;
 	int cg_status = 0;
-	pthread_t cg_Producer;
+	pthread_t cg_Producer[PRODUCER_SIZE];
 	pthread_t cg_Consumer[CONSUMER_SIZE];
 	double result_cgT;
 		
@@ -368,8 +376,10 @@ int main(int argc, char* argv[]) {
 	gettimeofday(&cg_start, NULL);
 	
 	// create producer thread
-	cg_status = pthread_create(&cg_Producer, NULL, cg_Produce, &time_quantum);
-	assert(cg_status == 0);
+	for(int i=0; i<PRODUCER_SIZE; i++) {
+		cg_status = pthread_create(&cg_Producer[i], NULL, cg_Produce, &time_quantum);
+		assert(cg_status == 0);
+	}
 
 	// create consumer thread
 	for(int i=0; i<CONSUMER_SIZE; i++) {
@@ -379,7 +389,8 @@ int main(int argc, char* argv[]) {
 		assert(cg_status == 0);
 	}
 	
-	pthread_join(cg_Producer, NULL);
+	for(int i=0; i<PRODUCER_SIZE; i++)
+		pthread_join(cg_Producer[i], NULL);
 	for(int i=0; i<CONSUMER_SIZE; i++)
 		pthread_join(cg_Consumer[i], NULL);
 	
@@ -398,11 +409,11 @@ int main(int argc, char* argv[]) {
 	printf("\tTotal Produce Number = %d\n", coarse_car_queue->produce_number);
 	printf("\tFinal Balance Value = %d\n", coarse_car_queue->balance);
 	printf("\tExecution time = %f -> %ldsec:%ldusec\n", result_cgT, cg_gap.tv_sec, cg_gap.tv_usec);
-	
+
 	/////////////// Fine-grained lock ver ///////////////
 	struct timeval fg_start, fg_end, fg_gap;
 	int fg_status = 0;
-	pthread_t fg_Producer;
+	pthread_t fg_Producer[PRODUCER_SIZE];
 	pthread_t fg_Consumer[CONSUMER_SIZE];
 	double result_fgT;
 	
@@ -410,8 +421,10 @@ int main(int argc, char* argv[]) {
 	gettimeofday(&fg_start, NULL);
 	
 	// create producer thread
-	fg_status = pthread_create(&fg_Producer, NULL,fg_Produce, &time_quantum);
-	assert(fg_status == 0);
+	for(int i=0; i<PRODUCER_SIZE; i++) {
+		fg_status = pthread_create(&fg_Producer[i], NULL,fg_Produce, &time_quantum);
+		assert(fg_status == 0);
+	}
 	
 	// create consumer thread
 	for(int i=0; i<CONSUMER_SIZE; i++) {
@@ -421,7 +434,8 @@ int main(int argc, char* argv[]) {
 		assert(fg_status == 0);
 	}
 	
-	pthread_join(fg_Producer, NULL);
+	for(int i=0; i<PRODUCER_SIZE; i++)		
+		pthread_join(fg_Producer[i], NULL);
 	for(int i=0; i<CONSUMER_SIZE; i++)
 		pthread_join(fg_Consumer[i], NULL);
 	
@@ -440,6 +454,6 @@ int main(int argc, char* argv[]) {
 	printf("\tTotal Produce Number = %d\n", fine_car_queue->produce_number);
 	printf("\tFinal Balance Value = %d\n", fine_car_queue->balance);
 	printf("\tExecution time = %f -> %ldsec:%ldusec\n", result_fgT, fg_gap.tv_sec, fg_gap.tv_usec);
-
+	
 	return 0;
 }

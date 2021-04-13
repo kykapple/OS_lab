@@ -26,6 +26,7 @@
 #include <asm/unistd.h>
 
 #define MAX_SIZE 10
+#define PRODUCER_SIZE 5
 #define CONSUMER_SIZE 5
 
 typedef struct Node {
