@@ -211,7 +211,6 @@ void* cg_Consume(void *arg) {
 	
 	while(1) {
 		if(coarse_car_queue->produce_number == total_car && isEmpty(coarse_car_queue)) break;	
-		
 		pthread_mutex_lock(&coarse_car_queue->mutex);
 		
 		while(coarse_car_queue->produce_number < total_car && coarse_car_queue->balance == 0)
@@ -222,7 +221,6 @@ void* cg_Consume(void *arg) {
 			int my_car = Dequeue(coarse_car_queue);
 			pthread_cond_signal(&cg_empty);
 		}
-		
 		pthread_mutex_unlock(&coarse_car_queue->mutex);
 	}
 }
@@ -236,10 +234,8 @@ void* fg_Produce(void* arg) {
 		sleep(tq/100);		// time it takes to release the vehicle
 		
 		pthread_mutex_lock(&fine_car_queue->mutex);
-		
 		while(fine_car_queue->balance == MAX_SIZE) 
-			pthread_cond_wait(&fg_empty, &fine_car_queue->mutex);
-			
+			pthread_cond_wait(&fg_empty, &fine_car_queue->mutex);	
 		pthread_mutex_unlock(&fine_car_queue->mutex);			
 		
 		pthread_mutex_lock(&fine_car_queue->tailLock);
@@ -250,12 +246,10 @@ void* fg_Produce(void* arg) {
 		pthread_mutex_unlock(&fine_car_queue->tailLock);
 		
 		pthread_mutex_lock(&fine_car_queue->mutex);
-		
 		if(fine_car_queue->produce_number < total_car)
 			pthread_cond_signal(&fg_fill);
 		else 
 			pthread_cond_broadcast(&fg_fill);	// means producer released all vehicles
-		
 		pthread_mutex_unlock(&fine_car_queue->mutex);	
 	}
 }
@@ -268,10 +262,8 @@ void* fg_Consume(void* arg) {
 		if(fine_car_queue->produce_number == total_car && isEmpty(fine_car_queue)) break;	
 
 		pthread_mutex_lock(&fine_car_queue->mutex);
-		
 		while(fine_car_queue->produce_number < total_car && fine_car_queue->balance == 0)
 			pthread_cond_wait(&fg_fill, &fine_car_queue->mutex);
-
 		pthread_mutex_unlock(&fine_car_queue->mutex);
 		
 		// Dequeue only possible when the consumer and vehicle number match
@@ -322,9 +314,9 @@ int main(int argc, char* argv[]) {
 			exit(0);
 		}
 	}
-	
+/*	
 	// Segmentation fault
-	/////////////// without lock ver ///////////////
+	/////////////// Without lock ///////////////
 	struct timeval start, end, gap;
 	int status = 0;
 	pthread_t Producer;
@@ -365,10 +357,8 @@ int main(int argc, char* argv[]) {
 	printf("\tTotal Produce Number = %d\n", car_queue->produce_number);
 	printf("\tFinal Balance Value = %d\n", car_queue->balance);
 	printf("\tExecution time = %f -> %ldsec:%ldusec\n", result_T, gap.tv_sec, gap.tv_usec);
-
-	/////////////// Coarse-grained lock ver ///////////////
-/*	double avg = 0;
-	for(int i=0; i<10; i++) {
+*/
+	/////////////// Coarse-grained lock ///////////////
 	struct timeval cg_start, cg_end, cg_gap;
 	int cg_status = 0;
 	pthread_t cg_Producer[PRODUCER_SIZE];
@@ -406,23 +396,15 @@ int main(int argc, char* argv[]) {
 		cg_gap.tv_sec -= 1; 
 		cg_gap.tv_usec += 1000000;
 	}
-	
-	printf("Execution Time = %f\n", result_cgT);
-	avg += result_cgT;
-	}
-	avg /= 10.0;
-	printf("Average Execution Time = %f\n", avg);
 
-	/*
+	
 	printf("(2) Coarse-grained Lock Experiment\n");
 	printf("Experiment Info\n");
 	printf("\tTotal Produce Number = %d\n", coarse_car_queue->produce_number);
 	printf("\tFinal Balance Value = %d\n", coarse_car_queue->balance);
 	printf("\tExecution time = %f -> %ldsec:%ldusec\n", result_cgT, cg_gap.tv_sec, cg_gap.tv_usec);
-	*/
-	/////////////// Fine-grained lock ver ///////////////
-/*	double avg = 0;
-	for(int i=0; i<10; i++) {
+	
+	/////////////// Fine-grained lock ///////////////
 	struct timeval fg_start, fg_end, fg_gap;
 	int fg_status = 0;
 	pthread_t fg_Producer[PRODUCER_SIZE];
@@ -461,18 +443,12 @@ int main(int argc, char* argv[]) {
 		fg_gap.tv_usec += 1000000;
 	}
 
-	printf("Execution Time : %f\n", result_fgT);
-	avg += result_fgT;
-	}
-	avg /= 10.0;
-	printf("Average Execution Time : %f\n", avg);
-*/
-	/*	
+	
 	printf("(3) Fine-grained Lock Experiment\n");
 	printf("Experiment Info\n");
 	printf("\tTotal Produce Number = %d\n", fine_car_queue->produce_number);
 	printf("\tFinal Balance Value = %d\n", fine_car_queue->balance);
 	printf("\tExecution time = %f -> %ldsec:%ldusec\n", result_fgT, fg_gap.tv_sec, fg_gap.tv_usec);
-	*/
+
 	return 0;
 }
