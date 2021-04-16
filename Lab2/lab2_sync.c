@@ -352,6 +352,7 @@ int main(int argc, char* argv[]) {
 		gap.tv_usec += 1000000;
 	}
 	
+	printf("==== Vehicle Production Problem ====\n");
 	printf("(1) No Lock Experiment\n");
 	printf("Experiment Info\n");
 	printf("\tTotal Produce Number = %d\n", car_queue->produce_number);
@@ -397,7 +398,7 @@ int main(int argc, char* argv[]) {
 		cg_gap.tv_usec += 1000000;
 	}
 
-	
+	printf("==== Vehicle Production Problem ====\n");
 	printf("(2) Coarse-grained Lock Experiment\n");
 	printf("Experiment Info\n");
 	printf("\tTotal Produce Number = %d\n", coarse_car_queue->produce_number);
@@ -443,7 +444,7 @@ int main(int argc, char* argv[]) {
 		fg_gap.tv_usec += 1000000;
 	}
 
-	
+	printf("==== Vehicle Production Problem ====\n");
 	printf("(3) Fine-grained Lock Experiment\n");
 	printf("Experiment Info\n");
 	printf("\tTotal Produce Number = %d\n", fine_car_queue->produce_number);
