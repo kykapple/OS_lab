@@ -50,3 +50,4 @@
 --------------
 #### Producer/Consumer Problem
 - Coarse-grained Lock vs Fine-grained Lock
+![쓰레드 개수 5개, 5개일 때 coarse-fine 차이](https://user-images.githubusercontent.com/76088639/115017808-077f7580-9ef2-11eb-9831-c7f11e286de4.png)
