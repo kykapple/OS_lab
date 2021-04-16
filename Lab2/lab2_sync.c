@@ -32,7 +32,7 @@
  * you need to implement Vehicle production Problem. 
  */
  
-// producer and consumers share the queue
+// producers and consumers share the queue
 CQ* car_queue = NULL;		// Without lock
 CQ* coarse_car_queue = NULL;	// Coarse-grained Lock
 CQ* fine_car_queue = NULL;	// Fine-grained Lock
@@ -64,7 +64,7 @@ void Init() {
 
 // Coarse-grained Lock initializer
 void cg_Init() {
-	coarse_car_queue = (CQ*) malloc(sizeof(CQ));	// initialize car_queue
+	coarse_car_queue = (CQ*) malloc(sizeof(CQ));	// initialize coarse_car_queue
 	coarse_car_queue->balance = 0;
 	coarse_car_queue->produce_number = 0;
 	coarse_car_queue->front = NULL;
@@ -78,7 +78,7 @@ void cg_Init() {
 
 // Fine-grained Lock initializer
 void fg_Init() {
-	fine_car_queue = (CQ*) malloc(sizeof(CQ));	// initialize car_queue
+	fine_car_queue = (CQ*) malloc(sizeof(CQ));	// initialize fine_car_queue
 	fine_car_queue->balance = 0;
 	fine_car_queue->produce_number = 0;
 	fine_car_queue->front = NULL;
@@ -170,7 +170,7 @@ void* Produce(void* arg) {
 void* Consume(void *arg) {
 	int* consumer_num = (int*) arg;
 	while(1) {
-		if(car_queue->produce_number == total_car && car_queue->balance == 0) break;
+		if(car_queue->produce_number == total_car && isEmpty(car_queue)) break;
 			
 		while(car_queue->produce_number < total_car && car_queue->balance == 0);	
 			
