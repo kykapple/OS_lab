@@ -433,3 +433,4 @@ void Lottery(int job_cnt) {
 	free(q->list);
 	free(q);
 }
+

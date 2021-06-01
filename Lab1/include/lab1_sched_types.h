@@ -17,11 +17,12 @@
 #define BOOSTING_PERIOD 100
 
 typedef struct JOB {
-    char name;                   // process name
+    char name;			// process name
     int arrival_time;
     int service_time;
-    struct JOB* next;           // point next job
-    int tickets;                // for Lottery
+    int time_quantum;		// for preemptive scheduling
+    struct JOB* next;		// point next job
+    int tickets;		// for Lottery
 } JOB;
 
 typedef struct JOB_LIST {
@@ -31,8 +32,8 @@ typedef struct JOB_LIST {
 
 typedef struct Queue {
     int time_quantum;           
-    JOB* jobs;          	// jobs in queue for FIFO, SJF (used array to sort fast)
-    JOB_LIST* list;     	// jobs in queue for RR, MLFQ, Lottery (used linkedlist)
+    JOB* jobs;			// jobs in queue for FIFO, SJF (used array to sort fast)
+    JOB_LIST* list;		// jobs in queue for RR, MLFQ, Lottery (used linkedlist)
     struct Queue* next_queue;	// for lower priority queue(MLFQ)
 } Queue;
 
@@ -51,3 +52,6 @@ void MLFQ(int job_cnt, int tq_level);
 void Lottery(int job_cnt);
 
 #endif /* LAB1_HEADER_H*/
+
+
+
