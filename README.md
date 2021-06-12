@@ -21,19 +21,22 @@
 - Give a higher priority to the shortest job
 - Non-preemptive
 
+![image](https://user-images.githubusercontent.com/76088639/121769564-443cb580-cb9f-11eb-9026-e53df8d2c696.png)
 #### RR
 - Runs a job for time quantum and switch to the next job
 - Preemptive
 
+![image](https://user-images.githubusercontent.com/76088639/121769571-4acb2d00-cb9f-11eb-8246-b61af8698824.png)
 #### MLFQ
 - Consist of multiple queues
 - Each queue is assigned a different priority level
 - A job that is ready to run is on a single queue
 
+![image](https://user-images.githubusercontent.com/76088639/121769577-4e5eb400-cb9f-11eb-9d00-6dc528310350.png)
 #### Lottery
 - Schedule a job who wins the lottery
 
-
+![image](https://user-images.githubusercontent.com/76088639/121769628-a39ac580-cb9f-11eb-918a-e618452db462.png)
 ## 2. Lab2 - Concurrent Data Structure
 ---------------
   ```
