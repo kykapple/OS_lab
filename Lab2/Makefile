@@ -1,8 +1,5 @@
 #
-#   DKU Operating System Lab
-#           Lab2 (Vehicle Production Problem)
-#           Student id : 
-#           Student name : 
+#   Lab2 (Vehicle Production Problem)
 #
 #   Makfeile :
 #       - Makefile for lab2 compilation.

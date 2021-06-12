@@ -1,8 +1,5 @@
 /*
-*   DKU Operating System Lab
-*           Lab2 (Vehicle production Problem)
-*           Student id : 32170260
-*           Student name : Kweon Yeong Kee
+*   Lab2 (Vehicle production Problem)
 *
 *   lab2_sync.c :
 *       - lab2 main file.
