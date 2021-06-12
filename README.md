@@ -34,8 +34,6 @@
 
 
 ## 2. Lab2 - Concurrent Data Structure
-
-### How to use
 ---------------
   ```
   $ git clone https://github.com/kykapple/OS_lab.git
