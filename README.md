@@ -21,7 +21,7 @@
 - Give a higher priority to the shortest job
 - Non-preemptive
 
-![image](https://user-images.githubusercontent.com/76088639/121769564-443cb580-cb9f-11eb-9026-e53df8d2c696.png)
+![image](https://user-images.githubusercontent.com/76088639/121769661-da70db80-cb9f-11eb-9907-147c1f54ba0f.png)
 #### RR
 - Runs a job for time quantum and switch to the next job
 - Preemptive
