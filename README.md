@@ -15,6 +15,7 @@
 #### FIFO
 - Schedule a process that arrives first
 - Non-preemptive
+
 ![image](https://user-images.githubusercontent.com/76088639/121769560-41da5b80-cb9f-11eb-8bec-9b1ac29bd833.png)
 #### SJF
 - Give a higher priority to the shortest job
