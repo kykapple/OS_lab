@@ -25,16 +25,11 @@
 
 #include "lab2_sync_types.h"
 
-/*
- * you need to implement Vehicle production Problem. 
- */
- 
 // producers and consumers share the queue
 CQ* car_queue = NULL;		// Without lock
 CQ* coarse_car_queue = NULL;	// Coarse-grained Lock
 CQ* fine_car_queue = NULL;	// Fine-grained Lock
 int total_car;
-
 
 void print(CQ* current_queue) {
 	Node* cur = current_queue->front;

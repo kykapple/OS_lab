@@ -47,10 +47,6 @@ typedef struct car_queue {
 
 pthread_cond_t cg_fill, cg_empty;
 pthread_cond_t fg_fill, fg_empty;
-
-/*
- * You need to Declare functions in  here
- */
  
 void print(CQ* current_queue);
 int isEmpty(CQ* current_queue);
