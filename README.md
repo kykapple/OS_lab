@@ -1,8 +1,6 @@
 # OS_lab
 
 ## 1. Lab1 - Scheduling Simulator
-
-### How to use
 ---------------
   ```
   $ git clone https://github.com/kykapple/OS_lab.git
