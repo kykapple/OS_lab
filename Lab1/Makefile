@@ -1,9 +1,4 @@
 #
-#	DKU Operating System Lab
-#	    Lab1 (Scheduler Algorithm Simulator)
-#	    Student id : 
-#	    Student name : 
-#
 #   Makfeile :
 #       - Makefile for lab1 compilation.
 #

@@ -1,9 +1,4 @@
 /*
-*	DKU Operating System Lab
-*	    Lab1 (Scheduler Algorithm Simulator)
-*	    Student id : 32170260
-*	    Student name : Kweon Yeong Kee
-*
 *   lab1_sched_types.h :
 *       - lab1 header file.
 *       - must contains scueduler algorithm function's declations.

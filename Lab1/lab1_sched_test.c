@@ -1,9 +1,4 @@
 /*
-*	DKU Operating System Lab
-*	    Lab1 (Scheduler Algorithm Simulator)
-*	    Student id : 32170260
-*	    Student name : Kweon Yeong Kee
-*
 *   lab1_sched.c :
 *       - Lab1 source file.
 *       - Must contains scueduler algorithm test code.
